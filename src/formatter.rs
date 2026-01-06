@@ -1,5 +1,4 @@
 use regex::Regex;
-
 pub enum FormatMode {
     Compact,
     Readable,
@@ -16,11 +15,18 @@ impl Formatter {
 
     pub fn format(&self, text: &str) -> String {
         let re = Regex::new(r" {2,}").unwrap();
-        re.replace_all(text, " ").to_string();
+        let text = re.replace_all(text, " ").to_string();
 
         let text = self.trim_lines(&text);
         let text = self.normalize_newlines(&text);
-        text
+        match self.mode {
+            FormatMode::Minimal => {
+                text.replace('\n', " ")
+            }
+            FormatMode::Compact | FormatMode::Readable => {
+                text
+            }
+        }
     }
 
     pub fn trim_lines(&self, text: &str) -> String { // helper function 
